@@ -3,7 +3,7 @@ package maps
 import "testing"
 
 func TestSearch(t *testing.T) {
-	dict := Dictionary{"test": "this is just a test"}
+	dict := Dict{"test": "this is just a test"}
 
 	t.Run("known word", func(t *testing.T) {
 		got, _ := dict.Search("test")
@@ -24,7 +24,7 @@ func TestSearch(t *testing.T) {
 
 func TestAdd(t *testing.T) {
 	t.Run("new word", func(t *testing.T) {
-		dict := Dictionary{}
+		dict := Dict{}
 		k := "test"
 		v := "this is just a test"
 
@@ -36,12 +36,35 @@ func TestAdd(t *testing.T) {
 	t.Run("existing word", func(t *testing.T) {
 		k := "test"
 		v := "this is just a test"
-		dict := Dictionary{k: v}
+		dict := Dict{k: v}
 
 		err := dict.Add(k, "new test")
 
 		assertError(t, err, ErrWordExists)
 		assertDefinition(t, dict, k, v)
+	})
+}
+
+func TestUpdate(t *testing.T) {
+	t.Run("existing word", func(t *testing.T) {
+		k := "test"
+		v := "this is just a test"
+		dict := Dict{k: v}
+		newV := "new value"
+
+		err := dict.Update(k, newV)
+
+		assertError(t, err, nil)
+		assertDefinition(t, dict, k, newV)
+	})
+	t.Run("new word", func(t *testing.T) {
+		k := "test"
+		v := "this is just a test"
+		dict := Dict{}
+
+		err := dict.Update(k, v)
+
+		assertError(t, err, ErrWordDoesNotExist)
 	})
 }
 
@@ -61,7 +84,7 @@ func assertError(t testing.TB, got, want error) {
 	}
 }
 
-func assertDefinition(t testing.TB, dict Dictionary, k, v string) {
+func assertDefinition(t testing.TB, dict Dict, k, v string) {
 	t.Helper()
 
 	got, err := dict.Search(k)
