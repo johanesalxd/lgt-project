@@ -53,3 +53,7 @@ func (d Dict) Update(key, value string) error {
 
 	return nil
 }
+
+func (d Dict) Delete(key string) {
+	delete(d, key)
+}
