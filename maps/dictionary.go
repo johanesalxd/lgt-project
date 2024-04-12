@@ -1,5 +1,17 @@
 package maps
 
-func Search(dict map[string]string, keys string) string {
-	return dict[keys]
+import "errors"
+
+var ErrNotFound = errors.New("could not find the word you were looking for")
+
+type Dictionary map[string]string
+
+func (d Dictionary) Search(keys string) (string, error) {
+	val, ok := d[keys]
+
+	if !ok {
+		return "", ErrNotFound
+	}
+
+	return val, nil
 }
