@@ -1,11 +1,22 @@
 package arrays
 
-func Sum(numbers [5]int) int {
+func Sum(numbers []int) int {
 	var sum int
 
-	for i := 0; i < 5; i++ {
-		sum += numbers[i]
+	for _, number := range numbers {
+		sum += number
 	}
 
 	return sum
+}
+
+func SumAll(numbersToSum ...[]int) []int {
+	length := len(numbersToSum)
+	sums := make([]int, length)
+
+	for i, numbers := range numbersToSum {
+		sums[i] = Sum(numbers)
+	}
+
+	return sums
 }
