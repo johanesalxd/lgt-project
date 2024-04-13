@@ -15,10 +15,13 @@ type Sleeper interface {
 	Sleep()
 }
 
-type DefaultSleeper struct{}
+type ConfigurableSleeper struct {
+	duration time.Duration
+	sleep    func(time.Duration)
+}
 
-func (d *DefaultSleeper) Sleep() {
-	time.Sleep(1 * time.Second)
+func (c *ConfigurableSleeper) Sleep() {
+	c.sleep(c.duration)
 }
 
 func Countdown(out io.Writer, wait Sleeper) {
@@ -28,4 +31,11 @@ func Countdown(out io.Writer, wait Sleeper) {
 	}
 
 	fmt.Fprint(out, finalWord)
+}
+
+func NewConfigurableSleeper(duration time.Duration, sleep func(time.Duration)) *ConfigurableSleeper {
+	return &ConfigurableSleeper{
+		duration: duration,
+		sleep: sleep,
+	}
 }
