@@ -55,6 +55,22 @@ func TestWalk(t *testing.T) {
 				Profile{33, "London"}},
 			ExpectedCalls: []string{"Chris", "London"},
 		},
+		{
+			Name: "slices",
+			Input: []Profile{
+				{33, "London"},
+				{34, "Paris"},
+			},
+			ExpectedCalls: []string{"London", "Paris"},
+		},
+		{
+			Name: "arrays",
+			Input: [2]Profile{
+				{33, "London"},
+				{34, "Paris"},
+			},
+			ExpectedCalls: []string{"London", "Paris"},
+		},
 	}
 
 	for _, test := range cases {
