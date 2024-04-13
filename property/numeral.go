@@ -1,9 +1,37 @@
 package property
 
+import "strings"
+
+type romanNumeral struct {
+	value  uint16
+	Symbol string
+}
+
+var allRomanNumerals = []romanNumeral{
+	{1000, "M"},
+	{900, "CM"},
+	{500, "D"},
+	{400, "CD"},
+	{100, "C"},
+	{90, "XC"},
+	{50, "L"},
+	{40, "XL"},
+	{10, "X"},
+	{9, "IX"},
+	{5, "V"},
+	{4, "IV"},
+	{1, "I"},
+}
+
 func ConvertToRoman(input int) string {
-	if input == 2 {
-		return "II"
+	var result strings.Builder
+
+	for _, numeral := range allRomanNumerals {
+		for input >= int(numeral.value) {
+			result.WriteString(numeral.Symbol)
+			input -= int(numeral.value)
+		}
 	}
 
-	return "I"
+	return result.String()
 }
