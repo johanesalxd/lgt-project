@@ -1,11 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
+	"os"
 
-	"github.com/johanesalxd/lgt-project/helloworld"
+	depinj "github.com/johanesalxd/lgt-project/dep_inj"
 )
 
 func main() {
-	fmt.Println(helloworld.Hello("world", ""))
+	// fmt.Println(helloworld.Hello("world", ""))
+
+	depinj.Greet(os.Stdout, "Elodie")
+	log.Fatal(http.ListenAndServe(":5001", http.HandlerFunc(depinj.MyGreeterHandler)))
 }
