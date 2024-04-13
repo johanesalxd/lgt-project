@@ -12,5 +12,6 @@ func main() {
 	// depinj.Greet(os.Stdout, "Elodie")
 	// log.Fatal(http.ListenAndServe(":5001", http.HandlerFunc(depinj.MyGreeterHandler)))
 
-	mocking.Countdown(os.Stdout)
+	sleeper := &mocking.DefaultSleeper{}
+	mocking.Countdown(os.Stdout, sleeper)
 }
