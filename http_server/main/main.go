@@ -7,7 +7,13 @@ import (
 	"github.com/johanesalxd/lgt-project/http_server/server"
 )
 
+type InMemoryPlayerStore struct{}
+
+func (i *InMemoryPlayerStore) GetPlayerScore(name string) int {
+	return 123
+}
+
 func main() {
-	handler := http.HandlerFunc(server.PlayerServer)
-	log.Fatal(http.ListenAndServe(":8498", handler))
+	server := &server.PlayerServer{&InMemoryPlayerStore{}}
+	log.Fatal(http.ListenAndServe(":8498", server))
 }
