@@ -43,8 +43,8 @@ func TestNewBlogPosts(t *testing.T) {
 	})
 	t.Run("testing more details", func(t *testing.T) {
 		const (
-			firstBody  = "Title: Post 1\nDescription: Description 1"
-			secondBody = "Title: Post 2\nDescription: Description 2"
+			firstBody  = "Title: Post 1\nDescription: Description 1\nTags: tdd, go"
+			secondBody = "Title: Post 2\nDescription: Description 2\nTags: rust, borrow-checker"
 		)
 
 		fs := fstest.MapFS{
@@ -60,6 +60,7 @@ func TestNewBlogPosts(t *testing.T) {
 		assertPost(t, posts[0], readingfiles.Post{
 			Title:       "Post 1",
 			Description: "Description 1",
+			Tags:        []string{"tdd", "go"},
 		})
 	})
 }

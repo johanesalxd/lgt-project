@@ -4,11 +4,18 @@ import (
 	"bufio"
 	"io"
 	"io/fs"
+	"strings"
+)
+
+const (
+	titleSep = "Title: "
+	descSep  = "Description: "
+	tagsSep  = "Tags: "
 )
 
 type Post struct {
-	Title, Description, Body string
-	Tags                     []string
+	Title, Description string
+	Tags               []string
 }
 
 func NewPostsFromFS(inputFS fs.FS) ([]Post, error) {
@@ -44,14 +51,15 @@ func getPost(inputFS fs.FS, inputName string) (Post, error) {
 func newPost(input io.Reader) (Post, error) {
 	scanner := bufio.NewScanner(input)
 
-	scanner.Scan()
-	titleLine := scanner.Text()
+	readLine := func(tag string) string {
+		scanner.Scan()
 
-	scanner.Scan()
-	descLine := scanner.Text()
+		return strings.TrimPrefix(scanner.Text(), tag)
+	}
 
 	return Post{
-		Title:       titleLine[7:],
-		Description: descLine[13:],
+		Title:       readLine(titleSep),
+		Description: readLine(descSep),
+		Tags:        strings.Split(readLine(tagsSep), ", "),
 	}, nil
 }
