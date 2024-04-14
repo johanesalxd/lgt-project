@@ -31,20 +31,22 @@ func TestNewBlogPosts(t *testing.T) {
 		}
 
 		posts, err := readingfiles.NewPostsFromFS(fs)
-
 		if err != nil {
 			t.Fatal(err)
-		}
-
-		got := posts[0]
-		want := readingfiles.Post{Title: "Post 1"}
-
-		if !reflect.DeepEqual(got, want) {
-			t.Errorf("got %+v want %+v", got, want)
 		}
 
 		if len(posts) != len(fs) {
 			t.Errorf("got %d want %d", len(posts), len(fs))
 		}
+
+		assertPost(t, posts[0], readingfiles.Post{Title: "Post 1"})
 	})
+}
+
+func assertPost(t *testing.T, got, want readingfiles.Post) {
+	t.Helper()
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %+v want %+v", got, want)
+	}
 }
