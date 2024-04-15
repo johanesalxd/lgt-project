@@ -1,7 +1,6 @@
 package store
 
 import (
-	"encoding/json"
 	"io"
 	"sync"
 
@@ -14,7 +13,7 @@ type InMemoryPlayerStore struct {
 }
 
 type FSStore struct {
-	db io.Reader
+	db io.ReadSeeker
 }
 
 func NewInMemoryPlayerStore() *InMemoryPlayerStore {
@@ -24,7 +23,7 @@ func NewInMemoryPlayerStore() *InMemoryPlayerStore {
 	}
 }
 
-func NewFSStore(db io.Reader) *FSStore {
+func NewFSStore(db io.ReadSeeker) *FSStore {
 	return &FSStore{db: db}
 }
 
@@ -53,9 +52,9 @@ func (i *InMemoryPlayerStore) GetLeague() []server.Player {
 }
 
 func (f *FSStore) GetLeague() []server.Player {
-	var table []server.Player
+	f.db.Seek(0, io.SeekStart)
 
-	json.NewDecoder(f.db).Decode(&table)
+	table, _ := f.newTable(f.db)
 
 	return table
 }
