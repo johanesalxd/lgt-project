@@ -33,5 +33,11 @@ func (i *InMemoryPlayerStore) RecordWin(name string) {
 }
 
 func (i *InMemoryPlayerStore) GetLeague() []server.Player {
-	return nil
+	var table []server.Player
+
+	for name, wins := range i.store {
+		table = append(table, server.Player{Name: name, Wins: wins})
+	}
+
+	return table
 }

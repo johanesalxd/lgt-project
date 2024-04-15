@@ -23,6 +23,17 @@ func newGetPostLeagueRequest(method string) *http.Request {
 	return request
 }
 
+func getTableFromBody(t testing.TB, body io.Reader) (table []server.Player) {
+	t.Helper()
+
+	err := json.NewDecoder(body).Decode(&table)
+	if err != nil {
+		t.Fatalf("failed to parse got %q error %v", body, err)
+	}
+
+	return
+}
+
 func assertResponseBody(t testing.TB, got, want string) {
 	t.Helper()
 
@@ -45,17 +56,6 @@ func assertLeague(t testing.TB, got, want []server.Player) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
 	}
-}
-
-func assertLeagueResponseBody(t testing.TB, body io.Reader) (table []server.Player) {
-	t.Helper()
-
-	err := json.NewDecoder(body).Decode(&table)
-	if err != nil {
-		t.Fatalf("failed to parse got %q error %v", body, err)
-	}
-
-	return
 }
 
 func assertContentType(t testing.TB, got string) {

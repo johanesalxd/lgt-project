@@ -130,7 +130,7 @@ func TestLeague(t *testing.T) {
 
 		assertStatus(t, response.Code, http.StatusOK)
 		assertContentType(t, response.Result().Header.Get("content-type"))
-		got := assertLeagueResponseBody(t, response.Body)
+		got := getTableFromBody(t, response.Body)
 		assertLeague(t, got, table)
 	})
 }

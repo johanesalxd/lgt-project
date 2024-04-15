@@ -10,20 +10,38 @@ import (
 )
 
 func TestRecordAndRetrieveWins(t *testing.T) {
-	server := server.NewPlayerServer(store.NewInMemoryPlayerStore())
+	svr := server.NewPlayerServer(store.NewInMemoryPlayerStore())
 	player := "Pepper"
 
 	response := httptest.NewRecorder()
 	request := newGetScorePostWinRequest(player, http.MethodPost)
 
-	server.ServeHTTP(response, request)
-	server.ServeHTTP(response, request)
-	server.ServeHTTP(response, request)
+	svr.ServeHTTP(response, request)
+	svr.ServeHTTP(response, request)
+	svr.ServeHTTP(response, request)
 
-	response = httptest.NewRecorder()
-	request = newGetScorePostWinRequest(player, http.MethodGet)
-	server.ServeHTTP(response, request)
+	t.Run("get score", func(t *testing.T) {
+		response = httptest.NewRecorder()
+		request = newGetScorePostWinRequest(player, http.MethodGet)
 
-	assertStatus(t, response.Code, http.StatusOK)
-	assertResponseBody(t, response.Body.String(), "3")
+		svr.ServeHTTP(response, request)
+
+		assertStatus(t, response.Code, http.StatusOK)
+		assertResponseBody(t, response.Body.String(), "3")
+	})
+	t.Run("get league table", func(t *testing.T) {
+		response := httptest.NewRecorder()
+		request := newGetPostLeagueRequest(http.MethodGet)
+
+		svr.ServeHTTP(response, request)
+
+		got := getTableFromBody(t, response.Body)
+		want := []server.Player{
+			{
+				Name: "Pepper",
+				Wins: 3,
+			},
+		}
+		assertLeague(t, got, want)
+	})
 }
