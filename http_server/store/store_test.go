@@ -1,7 +1,6 @@
 package store_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/johanesalxd/lgt-project/http_server/server"
@@ -10,9 +9,11 @@ import (
 
 func TestFSStore(t *testing.T) {
 	t.Run("get league table from reader", func(t *testing.T) {
-		db := strings.NewReader(`[
+		db, cleanDB := createTempFile(t, `[
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
+		defer cleanDB()
+
 		store := store.NewFSStore(db)
 
 		got := store.GetLeague()
@@ -28,9 +29,11 @@ func TestFSStore(t *testing.T) {
 		assertLeague(t, got, want)
 	})
 	t.Run("get player score", func(t *testing.T) {
-		db := strings.NewReader(`[
+		db, cleanDB := createTempFile(t, `[
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
+		defer cleanDB()
+
 		store := store.NewFSStore(db)
 
 		got := store.GetPlayerScore("Chris")

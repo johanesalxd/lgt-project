@@ -1,6 +1,8 @@
 package store_test
 
 import (
+	"io"
+	"os"
 	"reflect"
 	"testing"
 
@@ -21,4 +23,22 @@ func assertScoreEquals(t testing.TB, got, want int) {
 	if got != want {
 		t.Errorf("got %d want %d", got, want)
 	}
+}
+
+func createTempFile(t testing.TB, initData string) (io.ReadWriteSeeker, func()) {
+	t.Helper()
+
+	tmpFile, err := os.CreateTemp("", "db")
+	if err != nil {
+		t.Fatalf("couldn't create temp file %v", err)
+	}
+
+	tmpFile.Write([]byte(initData))
+
+	rmFile := func() {
+		tmpFile.Close()
+		os.Remove(tmpFile.Name())
+	}
+
+	return tmpFile, rmFile
 }

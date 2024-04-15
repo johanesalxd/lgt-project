@@ -13,7 +13,7 @@ type InMemoryPlayerStore struct {
 }
 
 type FSStore struct {
-	db io.ReadSeeker
+	db io.ReadWriteSeeker
 }
 
 func NewInMemoryPlayerStore() *InMemoryPlayerStore {
@@ -23,7 +23,7 @@ func NewInMemoryPlayerStore() *InMemoryPlayerStore {
 	}
 }
 
-func NewFSStore(db io.ReadSeeker) *FSStore {
+func NewFSStore(db io.ReadWriteSeeker) *FSStore {
 	return &FSStore{db: db}
 }
 
