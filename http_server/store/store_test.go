@@ -1,7 +1,6 @@
 package store_test
 
 import (
-	"reflect"
 	"strings"
 	"testing"
 
@@ -28,12 +27,15 @@ func TestFSStore(t *testing.T) {
 
 		assertLeague(t, got, want)
 	})
-}
+	t.Run("get player score", func(t *testing.T) {
+		db := strings.NewReader(`[
+			{"Name": "Cleo", "Wins": 10},
+			{"Name": "Chris", "Wins": 33}]`)
+		store := store.NewFSStore(db)
 
-func assertLeague(t testing.TB, got, want []server.Player) {
-	t.Helper()
+		got := store.GetPlayerScore("Chris")
+		want := 33
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %v want %v", got, want)
-	}
+		assertScoreEquals(t, got, want)
+	})
 }
