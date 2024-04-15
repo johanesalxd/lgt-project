@@ -5,17 +5,10 @@ import (
 	"net/http"
 
 	"github.com/johanesalxd/lgt-project/http_server/server"
+	"github.com/johanesalxd/lgt-project/http_server/store"
 )
 
-type InMemoryPlayerStore struct{}
-
-func (i *InMemoryPlayerStore) GetPlayerScore(name string) int {
-	return 123
-}
-
-func (i *InMemoryPlayerStore) RecordWin(name string) {}
-
 func main() {
-	server := &server.PlayerServer{&InMemoryPlayerStore{}}
+	server := &server.PlayerServer{Store: store.NewInMemoryPlayerStore()}
 	log.Fatal(http.ListenAndServe(":8498", server))
 }

@@ -31,10 +31,10 @@ func TestGETPlayer(t *testing.T) {
 			"Floyd":  10,
 		},
 	}
-	server := &server.PlayerServer{&store}
+	server := server.PlayerServer{&store}
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
-		request := newGetScoreRequest("Pepper")
+		request := newGetScorePostWinRequest("Pepper", http.MethodGet)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
@@ -43,7 +43,7 @@ func TestGETPlayer(t *testing.T) {
 		assertResponseBody(t, response.Body.String(), "20")
 	})
 	t.Run("returns Floyd's score", func(t *testing.T) {
-		request := newGetScoreRequest("Floyd")
+		request := newGetScorePostWinRequest("Floyd", http.MethodGet)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
@@ -52,7 +52,7 @@ func TestGETPlayer(t *testing.T) {
 		assertResponseBody(t, response.Body.String(), "10")
 	})
 	t.Run("return 404 on missing players", func(t *testing.T) {
-		request := newGetScoreRequest("Apollo")
+		request := newGetScorePostWinRequest("Apollo", http.MethodGet)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
@@ -65,11 +65,11 @@ func TestStoreWins(t *testing.T) {
 	store := StubPlayerStore{
 		scores: map[string]int{},
 	}
-	server := &server.PlayerServer{&store}
+	server := server.PlayerServer{&store}
 
 	t.Run("record wins on POST and returns 202", func(t *testing.T) {
 		player := "Pepper"
-		request := newPostWinRequest(player)
+		request := newGetScorePostWinRequest(player, http.MethodPost)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
@@ -86,14 +86,8 @@ func TestStoreWins(t *testing.T) {
 	})
 }
 
-func newGetScoreRequest(name string) *http.Request {
-	request, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", name), nil)
-
-	return request
-}
-
-func newPostWinRequest(name string) *http.Request {
-	request, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("/players/%s", name), nil)
+func newGetScorePostWinRequest(name, method string) *http.Request {
+	request, _ := http.NewRequest(method, fmt.Sprintf("/players/%s", name), nil)
 
 	return request
 }
