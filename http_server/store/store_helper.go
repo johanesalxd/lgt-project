@@ -8,7 +8,7 @@ import (
 	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
-func (f *FSStore) newTable(input io.Reader) ([]model.Player, error) {
+func newTable(input io.Reader) ([]model.Player, error) {
 	var table []model.Player
 
 	err := json.NewDecoder(input).Decode(&table)

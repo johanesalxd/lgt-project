@@ -3,61 +3,24 @@ package store
 import (
 	"encoding/json"
 	"io"
-	"sync"
 
 	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
-type InMemoryPlayerStore struct {
-	store map[string]int
-	lock  sync.RWMutex
-}
-
 type FSStore struct {
-	db io.ReadWriteSeeker
-}
-
-func NewInMemoryPlayerStore() *InMemoryPlayerStore {
-	return &InMemoryPlayerStore{
-		map[string]int{},
-		sync.RWMutex{},
-	}
+	db     io.ReadWriteSeeker
+	league model.League
 }
 
 func NewFSStore(db io.ReadWriteSeeker) *FSStore {
-	return &FSStore{db: db}
-}
+	db.Seek(0, io.SeekStart)
+	league, _ := newTable(db)
 
-func (i *InMemoryPlayerStore) GetPlayerScore(name string) int {
-	i.lock.RLock()
-	defer i.lock.RUnlock()
-
-	return i.store[name]
-}
-
-func (i *InMemoryPlayerStore) RecordWin(name string) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
-
-	i.store[name]++
-}
-
-func (i *InMemoryPlayerStore) GetLeague() model.League {
-	var table model.League
-
-	for name, wins := range i.store {
-		table = append(table, model.Player{Name: name, Wins: wins})
-	}
-
-	return table
+	return &FSStore{db: db, league: league}
 }
 
 func (f *FSStore) GetLeague() model.League {
-	f.db.Seek(0, io.SeekStart)
-
-	table, _ := f.newTable(f.db)
-
-	return table
+	return f.league
 }
 
 func (f *FSStore) GetPlayerScore(name string) int {
@@ -71,15 +34,14 @@ func (f *FSStore) GetPlayerScore(name string) int {
 }
 
 func (f *FSStore) RecordWin(name string) {
-	table := f.GetLeague()
-	player := table.Find(name)
+	player := f.league.Find(name)
 
 	if player != nil {
 		player.Wins++
 	} else {
-		table = append(table, model.Player{Name: name, Wins: 1})
+		f.league = append(f.league, model.Player{Name: name, Wins: 1})
 	}
 
 	f.db.Seek(0, io.SeekStart)
-	json.NewEncoder(f.db).Encode(table)
+	json.NewEncoder(f.db).Encode(f.league)
 }
