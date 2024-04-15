@@ -13,7 +13,7 @@ import (
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
-	league   []model.Player
+	league   model.League
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
@@ -26,7 +26,7 @@ func (s *StubPlayerStore) RecordWin(name string) {
 	s.winCalls = append(s.winCalls, name)
 }
 
-func (s *StubPlayerStore) GetLeague() []model.Player {
+func (s *StubPlayerStore) GetLeague() model.League {
 	return s.league
 }
 
@@ -102,7 +102,7 @@ func TestLeague(t *testing.T) {
 
 		svr.ServeHTTP(response, request)
 
-		var got []model.Player
+		var got model.League
 
 		err := json.NewDecoder(response.Body).Decode(&got)
 		if err != nil {
@@ -112,7 +112,7 @@ func TestLeague(t *testing.T) {
 		assertStatus(t, response.Code, http.StatusOK)
 	})
 	t.Run("returns league table as JSON", func(t *testing.T) {
-		table := []model.Player{
+		table := model.League{
 			{Name: "Cleo",
 				Wins: 32},
 			{Name: "Chris",

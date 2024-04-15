@@ -42,8 +42,8 @@ func (i *InMemoryPlayerStore) RecordWin(name string) {
 	i.store[name]++
 }
 
-func (i *InMemoryPlayerStore) GetLeague() []model.Player {
-	var table []model.Player
+func (i *InMemoryPlayerStore) GetLeague() model.League {
+	var table model.League
 
 	for name, wins := range i.store {
 		table = append(table, model.Player{Name: name, Wins: wins})
@@ -52,7 +52,7 @@ func (i *InMemoryPlayerStore) GetLeague() []model.Player {
 	return table
 }
 
-func (f *FSStore) GetLeague() []model.Player {
+func (f *FSStore) GetLeague() model.League {
 	f.db.Seek(0, io.SeekStart)
 
 	table, _ := f.newTable(f.db)
@@ -61,26 +61,21 @@ func (f *FSStore) GetLeague() []model.Player {
 }
 
 func (f *FSStore) GetPlayerScore(name string) int {
-	var wins int
+	player := f.GetLeague().Find(name)
 
-	for _, player := range f.GetLeague() {
-		if player.Name == name {
-			wins = player.Wins
-
-			break
-		}
+	if player != nil {
+		return player.Wins
 	}
 
-	return wins
+	return 0
 }
 
 func (f *FSStore) RecordWin(name string) {
 	table := f.GetLeague()
+	player := table.Find(name)
 
-	for i, player := range table {
-		if player.Name == name {
-			table[i].Wins++
-		}
+	if player != nil {
+		player.Wins++
 	}
 
 	f.db.Seek(0, io.SeekStart)
