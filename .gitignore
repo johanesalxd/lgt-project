@@ -1,4 +1,3 @@
-*
-!*/
-!*.*
+*/*.json
+*/http_server
 .vscode/*

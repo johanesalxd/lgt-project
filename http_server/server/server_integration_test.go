@@ -11,7 +11,9 @@ import (
 )
 
 func TestRecordAndRetrieveWins(t *testing.T) {
-	svr := server.NewPlayerServer(store.NewInMemoryPlayerStore())
+	db, cleanDB := createTempFile(t, "")
+	defer cleanDB()
+	svr := server.NewPlayerServer(store.NewFSStore(db))
 	player := "Pepper"
 
 	response := httptest.NewRecorder()
