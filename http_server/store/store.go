@@ -1,6 +1,7 @@
 package store
 
 import (
+	"encoding/json"
 	"io"
 	"sync"
 
@@ -71,4 +72,17 @@ func (f *FSStore) GetPlayerScore(name string) int {
 	}
 
 	return wins
+}
+
+func (f *FSStore) RecordWin(name string) {
+	table := f.GetLeague()
+
+	for i, player := range table {
+		if player.Name == name {
+			table[i].Wins++
+		}
+	}
+
+	f.db.Seek(0, io.SeekStart)
+	json.NewEncoder(f.db).Encode(table)
 }
