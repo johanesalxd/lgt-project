@@ -1,6 +1,8 @@
 package store
 
 import (
+	"encoding/json"
+	"io"
 	"sync"
 
 	"github.com/johanesalxd/lgt-project/http_server/server"
@@ -11,11 +13,19 @@ type InMemoryPlayerStore struct {
 	lock  sync.RWMutex
 }
 
+type FSStore struct {
+	db io.Reader
+}
+
 func NewInMemoryPlayerStore() *InMemoryPlayerStore {
 	return &InMemoryPlayerStore{
 		map[string]int{},
 		sync.RWMutex{},
 	}
+}
+
+func NewFSStore(db io.Reader) *FSStore {
+	return &FSStore{db: db}
 }
 
 func (i *InMemoryPlayerStore) GetPlayerScore(name string) int {
@@ -38,6 +48,14 @@ func (i *InMemoryPlayerStore) GetLeague() []server.Player {
 	for name, wins := range i.store {
 		table = append(table, server.Player{Name: name, Wins: wins})
 	}
+
+	return table
+}
+
+func (f *FSStore) GetLeague() []server.Player {
+	var table []server.Player
+
+	json.NewDecoder(f.db).Decode(&table)
 
 	return table
 }
