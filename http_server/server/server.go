@@ -4,6 +4,10 @@ import (
 	"net/http"
 )
 
+const (
+	ContentType = "application/json"
+)
+
 type PlayerStore interface {
 	GetPlayerScore(name string) int
 	RecordWin(name string)

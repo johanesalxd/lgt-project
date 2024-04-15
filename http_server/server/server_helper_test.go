@@ -57,3 +57,11 @@ func assertLeagueResponseBody(t testing.TB, body io.Reader) (table []server.Play
 
 	return
 }
+
+func assertContentType(t testing.TB, got string) {
+	t.Helper()
+
+	if got != server.ContentType {
+		t.Errorf("got %v want %v", got, server.ContentType)
+	}
+}

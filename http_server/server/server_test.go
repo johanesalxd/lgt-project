@@ -129,6 +129,7 @@ func TestLeague(t *testing.T) {
 		svr.ServeHTTP(response, request)
 
 		assertStatus(t, response.Code, http.StatusOK)
+		assertContentType(t, response.Result().Header.Get("content-type"))
 		got := assertLeagueResponseBody(t, response.Body)
 		assertLeague(t, got, table)
 	})
