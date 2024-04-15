@@ -1,10 +1,21 @@
 package store
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/johanesalxd/lgt-project/http_server/server"
+)
 
 type InMemoryPlayerStore struct {
 	store map[string]int
 	lock  sync.RWMutex
+}
+
+func NewInMemoryPlayerStore() *InMemoryPlayerStore {
+	return &InMemoryPlayerStore{
+		map[string]int{},
+		sync.RWMutex{},
+	}
 }
 
 func (i *InMemoryPlayerStore) GetPlayerScore(name string) int {
@@ -21,9 +32,6 @@ func (i *InMemoryPlayerStore) RecordWin(name string) {
 	i.store[name]++
 }
 
-func NewInMemoryPlayerStore() *InMemoryPlayerStore {
-	return &InMemoryPlayerStore{
-		map[string]int{},
-		sync.RWMutex{},
-	}
+func (i *InMemoryPlayerStore) GetLeague() []server.Player {
+	return nil
 }

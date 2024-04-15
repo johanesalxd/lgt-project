@@ -12,6 +12,7 @@ import (
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
+	league   []server.Player
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
@@ -22,6 +23,10 @@ func (s *StubPlayerStore) GetPlayerScore(name string) int {
 
 func (s *StubPlayerStore) RecordWin(name string) {
 	s.winCalls = append(s.winCalls, name)
+}
+
+func (s *StubPlayerStore) GetLeague() []server.Player {
+	return s.league
 }
 
 func TestGETPlayer(t *testing.T) {
@@ -91,7 +96,7 @@ func TestLeague(t *testing.T) {
 	svr := server.NewPlayerServer(&store)
 
 	t.Run("return 200 on league", func(t *testing.T) {
-		request, _ := http.NewRequest(http.MethodGet, "/league", nil)
+		request := newGetPostLeagueRequest(http.MethodGet)
 		response := httptest.NewRecorder()
 
 		svr.ServeHTTP(response, request)
@@ -104,5 +109,27 @@ func TestLeague(t *testing.T) {
 		}
 
 		assertStatus(t, response.Code, http.StatusOK)
+	})
+	t.Run("returns league table as JSON", func(t *testing.T) {
+		table := []server.Player{
+			{Name: "Cleo",
+				Wins: 32},
+			{Name: "Chris",
+				Wins: 20},
+			{Name: "Tiest",
+				Wins: 14},
+		}
+
+		store := StubPlayerStore{league: table}
+		svr := server.NewPlayerServer(&store)
+
+		request := newGetPostLeagueRequest(http.MethodGet)
+		response := httptest.NewRecorder()
+
+		svr.ServeHTTP(response, request)
+
+		assertStatus(t, response.Code, http.StatusOK)
+		got := assertLeagueResponseBody(t, response.Body)
+		assertLeague(t, got, table)
 	})
 }
