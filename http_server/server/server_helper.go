@@ -1,12 +1,15 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 )
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(p.getLeagueTable())
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -35,4 +38,11 @@ func (p *PlayerServer) processWin(w http.ResponseWriter, player string) {
 	p.store.RecordWin(player)
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func (p *PlayerServer) getLeagueTable() []Player {
+	return []Player{
+		{name: "Chris",
+			wins: 20},
+	}
 }

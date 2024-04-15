@@ -14,6 +14,11 @@ type PlayerServer struct {
 	http.Handler
 }
 
+type Player struct {
+	name string
+	wins int
+}
+
 func NewPlayerServer(store PlayerStore) *PlayerServer {
 	p := new(PlayerServer)
 	router := http.NewServeMux()
