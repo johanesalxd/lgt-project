@@ -76,6 +76,8 @@ func (f *FSStore) RecordWin(name string) {
 
 	if player != nil {
 		player.Wins++
+	} else {
+		table = append(table, model.Player{Name: name, Wins: 1})
 	}
 
 	f.db.Seek(0, io.SeekStart)

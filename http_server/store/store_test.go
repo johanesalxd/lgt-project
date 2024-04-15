@@ -13,7 +13,6 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-
 		store := store.NewFSStore(db)
 
 		got := store.GetLeague()
@@ -33,7 +32,6 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-
 		store := store.NewFSStore(db)
 
 		got := store.GetPlayerScore("Chris")
@@ -46,13 +44,26 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-
 		store := store.NewFSStore(db)
 
 		store.RecordWin("Chris")
 
 		got := store.GetPlayerScore("Chris")
 		want := 34
+
+		assertScoreEquals(t, got, want)
+	})
+	t.Run("store new player score", func(t *testing.T) {
+		db, cleanDB := createTempFile(t, `[
+			{"Name": "Cleo", "Wins": 10},
+			{"Name": "Chris", "Wins": 33}]`)
+		defer cleanDB()
+		store := store.NewFSStore(db)
+
+		store.RecordWin("Pepper")
+
+		got := store.GetPlayerScore("Pepper")
+		want := 1
 
 		assertScoreEquals(t, got, want)
 	})
