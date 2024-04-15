@@ -8,6 +8,21 @@ import (
 	"github.com/johanesalxd/lgt-project/http_server/server"
 )
 
+type StubPlayerStore struct {
+	scores   map[string]int
+	winCalls []string
+}
+
+func (s *StubPlayerStore) GetPlayerScore(name string) int {
+	score := s.scores[name]
+
+	return score
+}
+
+func (s *StubPlayerStore) RecordWin(name string) {
+	s.winCalls = append(s.winCalls, name)
+}
+
 func TestGETPlayer(t *testing.T) {
 	store := StubPlayerStore{
 		scores: map[string]int{
@@ -15,7 +30,7 @@ func TestGETPlayer(t *testing.T) {
 			"Floyd":  10,
 		},
 	}
-	server := server.PlayerServer{&store}
+	server := server.NewPlayerServer(&store)
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := newGetScorePostWinRequest("Pepper", http.MethodGet)
@@ -49,7 +64,7 @@ func TestStoreWins(t *testing.T) {
 	store := StubPlayerStore{
 		scores: map[string]int{},
 	}
-	server := server.PlayerServer{&store}
+	server := server.NewPlayerServer(&store)
 
 	t.Run("record wins on POST and returns 202", func(t *testing.T) {
 		player := "Pepper"
@@ -72,7 +87,7 @@ func TestStoreWins(t *testing.T) {
 
 func TestLeague(t *testing.T) {
 	store := StubPlayerStore{}
-	server := server.PlayerServer{&store}
+	server := server.NewPlayerServer(&store)
 
 	t.Run("return 200 on league", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/league", nil)
