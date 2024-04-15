@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/johanesalxd/lgt-project/http_server/model"
 	"github.com/johanesalxd/lgt-project/http_server/server"
 	"github.com/johanesalxd/lgt-project/http_server/store"
 )
@@ -36,7 +37,7 @@ func TestRecordAndRetrieveWins(t *testing.T) {
 		svr.ServeHTTP(response, request)
 
 		got := getTableFromBody(t, response.Body)
-		want := []server.Player{
+		want := []model.Player{
 			{
 				Name: "Pepper",
 				Wins: 3,

@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+
+	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
 const (
@@ -11,17 +13,12 @@ const (
 type PlayerStore interface {
 	GetPlayerScore(name string) int
 	RecordWin(name string)
-	GetLeague() []Player
+	GetLeague() []model.Player
 }
 
 type PlayerServer struct {
 	store PlayerStore
 	http.Handler
-}
-
-type Player struct {
-	Name string
-	Wins int
 }
 
 func NewPlayerServer(store PlayerStore) *PlayerServer {

@@ -6,10 +6,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/johanesalxd/lgt-project/http_server/server"
+	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
-func assertLeague(t testing.TB, got, want []server.Player) {
+func assertLeague(t testing.TB, got, want []model.Player) {
 	t.Helper()
 
 	if !reflect.DeepEqual(got, want) {

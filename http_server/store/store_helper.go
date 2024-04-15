@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/johanesalxd/lgt-project/http_server/server"
+	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
-func (f *FSStore) newTable(input io.Reader) ([]server.Player, error) {
-	var table []server.Player
+func (f *FSStore) newTable(input io.Reader) ([]model.Player, error) {
+	var table []model.Player
 
 	err := json.NewDecoder(input).Decode(&table)
 	if err != nil {

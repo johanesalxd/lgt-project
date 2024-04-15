@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/johanesalxd/lgt-project/http_server/server"
+	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
 type InMemoryPlayerStore struct {
@@ -42,17 +42,17 @@ func (i *InMemoryPlayerStore) RecordWin(name string) {
 	i.store[name]++
 }
 
-func (i *InMemoryPlayerStore) GetLeague() []server.Player {
-	var table []server.Player
+func (i *InMemoryPlayerStore) GetLeague() []model.Player {
+	var table []model.Player
 
 	for name, wins := range i.store {
-		table = append(table, server.Player{Name: name, Wins: wins})
+		table = append(table, model.Player{Name: name, Wins: wins})
 	}
 
 	return table
 }
 
-func (f *FSStore) GetLeague() []server.Player {
+func (f *FSStore) GetLeague() []model.Player {
 	f.db.Seek(0, io.SeekStart)
 
 	table, _ := f.newTable(f.db)

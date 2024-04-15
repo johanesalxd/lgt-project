@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/johanesalxd/lgt-project/http_server/model"
 	"github.com/johanesalxd/lgt-project/http_server/server"
 )
 
@@ -23,7 +24,7 @@ func newGetPostLeagueRequest(method string) *http.Request {
 	return request
 }
 
-func getTableFromBody(t testing.TB, body io.Reader) (table []server.Player) {
+func getTableFromBody(t testing.TB, body io.Reader) (table []model.Player) {
 	t.Helper()
 
 	err := json.NewDecoder(body).Decode(&table)
@@ -50,7 +51,7 @@ func assertStatus(t testing.TB, got, want int) {
 	}
 }
 
-func assertLeague(t testing.TB, got, want []server.Player) {
+func assertLeague(t testing.TB, got, want []model.Player) {
 	t.Helper()
 
 	if !reflect.DeepEqual(got, want) {

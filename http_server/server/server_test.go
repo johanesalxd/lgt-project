@@ -6,13 +6,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/johanesalxd/lgt-project/http_server/model"
 	"github.com/johanesalxd/lgt-project/http_server/server"
 )
 
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
-	league   []server.Player
+	league   []model.Player
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
@@ -25,7 +26,7 @@ func (s *StubPlayerStore) RecordWin(name string) {
 	s.winCalls = append(s.winCalls, name)
 }
 
-func (s *StubPlayerStore) GetLeague() []server.Player {
+func (s *StubPlayerStore) GetLeague() []model.Player {
 	return s.league
 }
 
@@ -101,7 +102,7 @@ func TestLeague(t *testing.T) {
 
 		svr.ServeHTTP(response, request)
 
-		var got []server.Player
+		var got []model.Player
 
 		err := json.NewDecoder(response.Body).Decode(&got)
 		if err != nil {
@@ -111,7 +112,7 @@ func TestLeague(t *testing.T) {
 		assertStatus(t, response.Code, http.StatusOK)
 	})
 	t.Run("returns league table as JSON", func(t *testing.T) {
-		table := []server.Player{
+		table := []model.Player{
 			{Name: "Cleo",
 				Wins: 32},
 			{Name: "Chris",

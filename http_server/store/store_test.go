@@ -3,7 +3,7 @@ package store_test
 import (
 	"testing"
 
-	"github.com/johanesalxd/lgt-project/http_server/server"
+	"github.com/johanesalxd/lgt-project/http_server/model"
 	"github.com/johanesalxd/lgt-project/http_server/store"
 )
 
@@ -17,7 +17,7 @@ func TestFSStore(t *testing.T) {
 		store := store.NewFSStore(db)
 
 		got := store.GetLeague()
-		want := []server.Player{
+		want := []model.Player{
 			{Name: "Cleo", Wins: 10},
 			{Name: "Chris", Wins: 33},
 		}
