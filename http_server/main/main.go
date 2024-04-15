@@ -10,5 +10,5 @@ import (
 
 func main() {
 	server := server.NewPlayerServer(store.NewInMemoryPlayerStore())
-	log.Fatal(http.ListenAndServe(":8498", &server))
+	log.Fatal(http.ListenAndServe(":8498", server))
 }
