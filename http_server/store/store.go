@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 
 	"github.com/johanesalxd/lgt-project/http_server/model"
 )
@@ -40,6 +41,9 @@ func NewTape(db *os.File) io.Writer {
 }
 
 func (f *FSStore) GetLeague() model.League {
+	sort.Slice(f.league, func(i, j int) bool {
+		return f.league[i].Wins > f.league[j].Wins
+	})
 	return f.league
 }
 

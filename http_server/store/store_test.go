@@ -9,7 +9,7 @@ import (
 )
 
 func TestFSStore(t *testing.T) {
-	t.Run("get league table from reader", func(t *testing.T) {
+	t.Run("get sorted league table from reader", func(t *testing.T) {
 		db, cleanDB := createTempFile(t, `[
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
@@ -20,8 +20,8 @@ func TestFSStore(t *testing.T) {
 
 		got := store.GetLeague()
 		want := model.League{
-			{Name: "Cleo", Wins: 10},
 			{Name: "Chris", Wins: 33},
+			{Name: "Cleo", Wins: 10},
 		}
 
 		assertLeague(t, got, want)
