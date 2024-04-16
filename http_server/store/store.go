@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 
@@ -17,11 +18,28 @@ type Tape struct {
 	file *os.File
 }
 
-func NewFSStore(db *os.File) *FSStore {
+func NewFSStore(db *os.File) (*FSStore, error) {
 	db.Seek(0, io.SeekStart)
-	league, _ := newTable(db)
 
-	return &FSStore{db: json.NewEncoder(&Tape{db}), league: league}
+	info, err := db.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("can't get info from file %s with error %v", db.Name(), err)
+	}
+
+	if info.Size() == 0 {
+		db.Write([]byte("[]"))
+		db.Seek(0, io.SeekStart)
+	}
+
+	league, err := newTable(db)
+	if err != nil {
+		return nil, fmt.Errorf("can't load store from file %s with error %v", db.Name(), err)
+	}
+
+	return &FSStore{
+		db:     json.NewEncoder(&Tape{db}),
+		league: league,
+	}, nil
 }
 
 func NewTape(db *os.File) io.Writer {

@@ -11,9 +11,14 @@ import (
 )
 
 func TestRecordAndRetrieveWins(t *testing.T) {
-	db, cleanDB := createTempFile(t, "")
+	db, cleanDB := createTempFile(t, "[]")
 	defer cleanDB()
-	svr := server.NewPlayerServer(store.NewFSStore(db))
+
+	store, err := store.NewFSStore(db)
+
+	assertNoError(t, err)
+
+	svr := server.NewPlayerServer(store)
 	player := "Pepper"
 
 	response := httptest.NewRecorder()

@@ -14,7 +14,9 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-		store := store.NewFSStore(db)
+		store, err := store.NewFSStore(db)
+
+		assertNoError(t, err)
 
 		got := store.GetLeague()
 		want := model.League{
@@ -33,7 +35,9 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-		store := store.NewFSStore(db)
+		store, err := store.NewFSStore(db)
+
+		assertNoError(t, err)
 
 		got := store.GetPlayerScore("Chris")
 		want := 33
@@ -45,7 +49,9 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-		store := store.NewFSStore(db)
+		store, err := store.NewFSStore(db)
+
+		assertNoError(t, err)
 
 		store.RecordWin("Chris")
 
@@ -59,7 +65,9 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-		store := store.NewFSStore(db)
+		store, err := store.NewFSStore(db)
+
+		assertNoError(t, err)
 
 		store.RecordWin("Pepper")
 
@@ -68,22 +76,32 @@ func TestFSStore(t *testing.T) {
 
 		assertScoreEquals(t, got, want)
 	})
+	t.Run("test with empty file", func(t *testing.T) {
+		file, clean := createTempFile(t, "")
+		defer clean()
+
+		_, err := store.NewFSStore(file)
+
+		assertNoError(t, err)
+	})
 }
 
 func TestTapeWrite(t *testing.T) {
-	file, clean := createTempFile(t, "12345")
-	defer clean()
+	t.Run("test with existing file", func(t *testing.T) {
+		file, clean := createTempFile(t, "12345")
+		defer clean()
 
-	tape := store.NewTape(file)
-	tape.Write([]byte("abc"))
+		tape := store.NewTape(file)
+		tape.Write([]byte("abc"))
 
-	file.Seek(0, io.SeekStart)
-	newFileContents, _ := io.ReadAll(file)
+		file.Seek(0, io.SeekStart)
+		newFileContents, _ := io.ReadAll(file)
 
-	got := string(newFileContents)
-	want := "abc"
+		got := string(newFileContents)
+		want := "abc"
 
-	if got != want {
-		t.Errorf("got %q want %q", got, want)
-	}
+		if got != want {
+			t.Errorf("got %q want %q", got, want)
+		}
+	})
 }

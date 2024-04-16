@@ -17,6 +17,11 @@ func main() {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
 
-	server := server.NewPlayerServer(store.NewFSStore(db))
+	store, err := store.NewFSStore(db)
+	if err != nil {
+		log.Fatalf("can't write store to file %s with error %v", db.Name(), err)
+	}
+
+	server := server.NewPlayerServer(store)
 	log.Fatal(http.ListenAndServe(":8498", server))
 }
