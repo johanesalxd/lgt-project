@@ -19,7 +19,3 @@ func NewCLI(store server.PlayerStore, input io.Reader) *CLI {
 
 	return p
 }
-
-func (c *CLI) PlayPoker() {
-	c.store.RecordWin("Chris")
-}

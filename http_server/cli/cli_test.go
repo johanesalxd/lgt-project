@@ -29,7 +29,7 @@ func (s *StubPlayerStore) GetLeague() model.League {
 }
 
 func TestCLI(t *testing.T) {
-	t.Run("simple test", func(t *testing.T) {
+	t.Run("record win from user input", func(t *testing.T) {
 		in := strings.NewReader("Chris wins\n")
 		store := &StubPlayerStore{}
 		cli := cli.NewCLI(store, in)
@@ -37,5 +37,14 @@ func TestCLI(t *testing.T) {
 		cli.PlayPoker()
 
 		assertPlayerWin(t, store, "Chris")
+	})
+	t.Run("record win from other user input", func(t *testing.T) {
+		in := strings.NewReader("Cleo wins\n")
+		store := &StubPlayerStore{}
+		cli := cli.NewCLI(store, in)
+
+		cli.PlayPoker()
+
+		assertPlayerWin(t, store, "Cleo")
 	})
 }
