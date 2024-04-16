@@ -1,6 +1,7 @@
 package cli_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/johanesalxd/lgt-project/http_server/cli"
@@ -28,11 +29,13 @@ func (s *StubPlayerStore) GetLeague() model.League {
 }
 
 func TestCLI(t *testing.T) {
-	store := &StubPlayerStore{}
-	cli := cli.NewCLI(store)
-	cli.PlayPoker()
+	t.Run("simple test", func(t *testing.T) {
+		in := strings.NewReader("Chris wins\n")
+		store := &StubPlayerStore{}
+		cli := cli.NewCLI(store, in)
 
-	if len(store.winCalls) != 1 {
-		t.Fatalf("expected a win call but didn't get any")
-	}
+		cli.PlayPoker()
+
+		assertPlayerWin(t, store, "Chris")
+	})
 }
