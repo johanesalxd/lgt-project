@@ -9,7 +9,7 @@ import (
 )
 
 type FSStore struct {
-	db     io.Writer
+	db     *json.Encoder
 	league model.League
 }
 
@@ -21,7 +21,7 @@ func NewFSStore(db *os.File) *FSStore {
 	db.Seek(0, io.SeekStart)
 	league, _ := newTable(db)
 
-	return &FSStore{db: &Tape{db}, league: league}
+	return &FSStore{db: json.NewEncoder(&Tape{db}), league: league}
 }
 
 func NewTape(db *os.File) io.Writer {
@@ -51,7 +51,7 @@ func (f *FSStore) RecordWin(name string) {
 		f.league = append(f.league, model.Player{Name: name, Wins: 1})
 	}
 
-	json.NewEncoder(f.db).Encode(f.league)
+	f.db.Encode(f.league)
 }
 
 func (t *Tape) Write(p []byte) (n int, err error) {
