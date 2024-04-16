@@ -19,16 +19,9 @@ type Tape struct {
 }
 
 func NewFSStore(db *os.File) (*FSStore, error) {
-	db.Seek(0, io.SeekStart)
-
-	info, err := db.Stat()
+	err := initDB(db)
 	if err != nil {
-		return nil, fmt.Errorf("can't get info from file %s with error %v", db.Name(), err)
-	}
-
-	if info.Size() == 0 {
-		db.Write([]byte("[]"))
-		db.Seek(0, io.SeekStart)
+		return nil, fmt.Errorf("can't init store with error %v", err)
 	}
 
 	league, err := newTable(db)
