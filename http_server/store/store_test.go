@@ -1,6 +1,7 @@
 package store_test
 
 import (
+	"io"
 	"testing"
 
 	"github.com/johanesalxd/lgt-project/http_server/model"
@@ -16,7 +17,7 @@ func TestFSStore(t *testing.T) {
 		store := store.NewFSStore(db)
 
 		got := store.GetLeague()
-		want := []model.Player{
+		want := model.League{
 			{Name: "Cleo", Wins: 10},
 			{Name: "Chris", Wins: 33},
 		}
@@ -67,4 +68,22 @@ func TestFSStore(t *testing.T) {
 
 		assertScoreEquals(t, got, want)
 	})
+}
+
+func TestTapeWrite(t *testing.T) {
+	file, clean := createTempFile(t, "12345")
+	defer clean()
+
+	tape := store.NewTape(file)
+	tape.Write([]byte("abc"))
+
+	file.Seek(0, io.SeekStart)
+	newFileContents, _ := io.ReadAll(file)
+
+	got := string(newFileContents)
+	want := "abc"
+
+	if got != want {
+		t.Errorf("got %q want %q", got, want)
+	}
 }

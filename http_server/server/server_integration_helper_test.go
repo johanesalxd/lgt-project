@@ -1,12 +1,11 @@
 package server_test
 
 import (
-	"io"
 	"os"
 	"testing"
 )
 
-func createTempFile(t testing.TB, initData string) (io.ReadWriteSeeker, func()) {
+func createTempFile(t testing.TB, initData string) (*os.File, func()) {
 	t.Helper()
 
 	tmpFile, err := os.CreateTemp("", "db")

@@ -8,8 +8,8 @@ import (
 	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
-func newTable(input io.Reader) ([]model.Player, error) {
-	var table []model.Player
+func newTable(input io.Reader) (model.League, error) {
+	var table model.League
 
 	err := json.NewDecoder(input).Decode(&table)
 	if err != nil {

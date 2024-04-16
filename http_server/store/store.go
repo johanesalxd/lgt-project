@@ -3,20 +3,29 @@ package store
 import (
 	"encoding/json"
 	"io"
+	"os"
 
 	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
 type FSStore struct {
-	db     io.ReadWriteSeeker
+	db     io.Writer
 	league model.League
 }
 
-func NewFSStore(db io.ReadWriteSeeker) *FSStore {
+type Tape struct {
+	file *os.File
+}
+
+func NewFSStore(db *os.File) *FSStore {
 	db.Seek(0, io.SeekStart)
 	league, _ := newTable(db)
 
-	return &FSStore{db: db, league: league}
+	return &FSStore{db: &Tape{db}, league: league}
+}
+
+func NewTape(db *os.File) io.Writer {
+	return &Tape{file: db}
 }
 
 func (f *FSStore) GetLeague() model.League {
@@ -42,6 +51,12 @@ func (f *FSStore) RecordWin(name string) {
 		f.league = append(f.league, model.Player{Name: name, Wins: 1})
 	}
 
-	f.db.Seek(0, io.SeekStart)
 	json.NewEncoder(f.db).Encode(f.league)
+}
+
+func (t *Tape) Write(p []byte) (n int, err error) {
+	t.file.Truncate(0)
+	t.file.Seek(0, io.SeekStart)
+
+	return t.file.Write(p)
 }

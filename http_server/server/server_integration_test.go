@@ -39,7 +39,7 @@ func TestRecordAndRetrieveWins(t *testing.T) {
 		svr.ServeHTTP(response, request)
 
 		got := getTableFromBody(t, response.Body)
-		want := []model.Player{
+		want := model.League{
 			{
 				Name: "Pepper",
 				Wins: 3,

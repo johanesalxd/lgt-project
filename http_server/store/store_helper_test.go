@@ -1,7 +1,6 @@
 package store_test
 
 import (
-	"io"
 	"os"
 	"reflect"
 	"testing"
@@ -9,7 +8,7 @@ import (
 	"github.com/johanesalxd/lgt-project/http_server/model"
 )
 
-func assertLeague(t testing.TB, got, want []model.Player) {
+func assertLeague(t testing.TB, got, want model.League) {
 	t.Helper()
 
 	if !reflect.DeepEqual(got, want) {
@@ -25,7 +24,7 @@ func assertScoreEquals(t testing.TB, got, want int) {
 	}
 }
 
-func createTempFile(t testing.TB, initData string) (io.ReadWriteSeeker, func()) {
+func createTempFile(t testing.TB, initData string) (*os.File, func()) {
 	t.Helper()
 
 	tmpFile, err := os.CreateTemp("", "db")

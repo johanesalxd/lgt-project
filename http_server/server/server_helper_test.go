@@ -24,7 +24,7 @@ func newGetPostLeagueRequest(method string) *http.Request {
 	return request
 }
 
-func getTableFromBody(t testing.TB, body io.Reader) (table []model.Player) {
+func getTableFromBody(t testing.TB, body io.Reader) (table model.League) {
 	t.Helper()
 
 	err := json.NewDecoder(body).Decode(&table)
@@ -51,7 +51,7 @@ func assertStatus(t testing.TB, got, want int) {
 	}
 }
 
-func assertLeague(t testing.TB, got, want []model.Player) {
+func assertLeague(t testing.TB, got, want model.League) {
 	t.Helper()
 
 	if !reflect.DeepEqual(got, want) {
