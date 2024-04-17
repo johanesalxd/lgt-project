@@ -1,21 +1,41 @@
 package cli
 
 import (
+	"bufio"
+	"fmt"
 	"io"
+	"os"
+	"time"
 
 	"github.com/johanesalxd/lgt-project/http_server/server"
 )
 
-type CLI struct {
-	store server.PlayerStore
-	input io.Reader
+type BlindAlerter interface {
+	ScheduledAlertAt(dur time.Duration, amt int)
 }
 
-func NewCLI(store server.PlayerStore, input io.Reader) *CLI {
-	p := new(CLI)
+type BlindAlerterFunc func(dur time.Duration, amt int)
 
-	p.store = store
-	p.input = input
+func (b BlindAlerterFunc) ScheduledAlertAt(dur time.Duration, amt int) {
+	b(dur, amt)
+}
 
-	return p
+type CLI struct {
+	store   server.PlayerStore
+	input   *bufio.Scanner
+	alerter BlindAlerter
+}
+
+func NewCLI(store server.PlayerStore, input io.Reader, alerter BlindAlerter) *CLI {
+	return &CLI{
+		store:   store,
+		input:   bufio.NewScanner(input),
+		alerter: alerter,
+	}
+}
+
+func StdOutAlerter(dur time.Duration, amt int) {
+	time.AfterFunc(dur, func() {
+		fmt.Fprintf(os.Stdout, "Blind is now %d\n", amt)
+	})
 }

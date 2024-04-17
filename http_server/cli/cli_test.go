@@ -1,8 +1,10 @@
 package cli_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/johanesalxd/lgt-project/http_server/cli"
 	"github.com/johanesalxd/lgt-project/http_server/model"
@@ -28,11 +30,21 @@ func (s *StubPlayerStore) GetLeague() model.League {
 	return s.league
 }
 
+type SpyBlindAlerter struct {
+	alerts []scheduledAlert
+}
+
+func (s *SpyBlindAlerter) ScheduledAlertAt(dur time.Duration, amt int) {
+	s.alerts = append(s.alerts, scheduledAlert{dur, amt})
+}
+
+var dummySpyAlerter = &SpyBlindAlerter{}
+
 func TestCLI(t *testing.T) {
 	t.Run("record win from user input", func(t *testing.T) {
 		in := strings.NewReader("Chris wins\n")
 		store := &StubPlayerStore{}
-		cli := cli.NewCLI(store, in)
+		cli := cli.NewCLI(store, in, dummySpyAlerter)
 
 		cli.PlayPoker()
 
@@ -41,10 +53,52 @@ func TestCLI(t *testing.T) {
 	t.Run("record win from other user input", func(t *testing.T) {
 		in := strings.NewReader("Cleo wins\n")
 		store := &StubPlayerStore{}
-		cli := cli.NewCLI(store, in)
+		cli := cli.NewCLI(store, in, dummySpyAlerter)
 
 		cli.PlayPoker()
 
 		assertPlayerWin(t, store, "Cleo")
 	})
+	t.Run("scheduled printing of blind values", func(t *testing.T) {
+		in := strings.NewReader("Chris wins\n")
+		store := &StubPlayerStore{}
+		alerter := &SpyBlindAlerter{}
+
+		cli := cli.NewCLI(store, in, alerter)
+		cli.PlayPoker()
+
+		cases := []scheduledAlert{
+			{0 * time.Second, 100},
+			{10 * time.Minute, 200},
+			{20 * time.Minute, 300},
+			{30 * time.Minute, 400},
+			{40 * time.Minute, 500},
+			{50 * time.Minute, 600},
+			{60 * time.Minute, 800},
+			{70 * time.Minute, 1000},
+			{80 * time.Minute, 2000},
+			{90 * time.Minute, 4000},
+			{100 * time.Minute, 8000},
+		}
+
+		for i, want := range cases {
+			t.Run(fmt.Sprint(want), func(t *testing.T) {
+				if len(alerter.alerts) <= i {
+					t.Fatalf("alert %d was not scheduled %v", i, alerter.alerts)
+				}
+
+				got := alerter.alerts[i]
+				assertScheduledAlert(t, got, want)
+			})
+		}
+	})
+}
+
+type scheduledAlert struct {
+	at     time.Duration
+	amount int
+}
+
+func (s scheduledAlert) String() string {
+	return fmt.Sprintf("%d chips at %v", s.amount, s.at)
 }

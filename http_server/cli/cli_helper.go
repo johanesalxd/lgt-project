@@ -1,14 +1,31 @@
 package cli
 
 import (
-	"bufio"
 	"strings"
+	"time"
 )
 
 func (c *CLI) PlayPoker() {
-	reader := bufio.NewScanner(c.input)
-	reader.Scan()
-	c.store.RecordWin(extractWinner(reader.Text()))
+	input := c.readLine()
+
+	c.store.RecordWin(extractWinner(input))
+	c.scheduleBlindAlerts()
+}
+
+func (c *CLI) readLine() string {
+	c.input.Scan()
+
+	return c.input.Text()
+}
+
+func (c *CLI) scheduleBlindAlerts() {
+	blinds := []int{100, 200, 300, 400, 500, 600, 800, 1000, 2000, 4000, 8000}
+	blindTime := 0 * time.Second
+
+	for _, blind := range blinds {
+		c.alerter.ScheduledAlertAt(blindTime, blind)
+		blindTime = blindTime + 10*time.Minute
+	}
 }
 
 func extractWinner(input string) string {
