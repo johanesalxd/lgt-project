@@ -14,7 +14,7 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-		store, err := store.NewFSStore(db)
+		store, err := store.NewTestFSStore(db)
 
 		assertNoError(t, err)
 
@@ -35,7 +35,7 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-		store, err := store.NewFSStore(db)
+		store, err := store.NewTestFSStore(db)
 
 		assertNoError(t, err)
 
@@ -49,7 +49,7 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-		store, err := store.NewFSStore(db)
+		store, err := store.NewTestFSStore(db)
 
 		assertNoError(t, err)
 
@@ -65,7 +65,7 @@ func TestFSStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDB()
-		store, err := store.NewFSStore(db)
+		store, err := store.NewTestFSStore(db)
 
 		assertNoError(t, err)
 
@@ -80,7 +80,7 @@ func TestFSStore(t *testing.T) {
 		file, clean := createTempFile(t, "")
 		defer clean()
 
-		_, err := store.NewFSStore(file)
+		_, err := store.NewTestFSStore(file)
 
 		assertNoError(t, err)
 	})

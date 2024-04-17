@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"sort"
 
@@ -15,25 +16,30 @@ type FSStore struct {
 	league model.League
 }
 
-type Tape struct {
-	file *os.File
+func NewFSStore(dbFileName string) (*FSStore, func(), error) {
+	db, err := os.OpenFile(dbFileName, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		log.Fatalf("problem opening %s %v", dbFileName, err)
+	}
+
+	closeFunc := func() {
+		db.Close()
+	}
+
+	store, err := newFSStore(db)
+	if err != nil {
+		log.Fatalf("can't write store to file %s with error %v", db.Name(), err)
+	}
+
+	return store, closeFunc, nil
 }
 
-func NewFSStore(db *os.File) (*FSStore, error) {
-	err := initDB(db)
-	if err != nil {
-		return nil, fmt.Errorf("can't init store with error %v", err)
-	}
+func NewTestFSStore(db *os.File) (*FSStore, error) {
+	return newFSStore(db)
+}
 
-	league, err := newTable(db)
-	if err != nil {
-		return nil, fmt.Errorf("can't load store from file %s with error %v", db.Name(), err)
-	}
-
-	return &FSStore{
-		db:     json.NewEncoder(&Tape{db}),
-		league: league,
-	}, nil
+type Tape struct {
+	file *os.File
 }
 
 func NewTape(db *os.File) io.Writer {
@@ -74,4 +80,21 @@ func (t *Tape) Write(p []byte) (n int, err error) {
 	t.file.Seek(0, io.SeekStart)
 
 	return t.file.Write(p)
+}
+
+func newFSStore(db *os.File) (*FSStore, error) {
+	err := initDB(db)
+	if err != nil {
+		return nil, fmt.Errorf("can't init store with error %v", err)
+	}
+
+	league, err := newTable(db)
+	if err != nil {
+		return nil, fmt.Errorf("can't load store from file %s with error %v", db.Name(), err)
+	}
+
+	return &FSStore{
+		db:     json.NewEncoder(&Tape{db}),
+		league: league,
+	}, nil
 }

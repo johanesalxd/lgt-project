@@ -14,7 +14,7 @@ func TestRecordAndRetrieveWins(t *testing.T) {
 	db, cleanDB := createTempFile(t, "[]")
 	defer cleanDB()
 
-	store, err := store.NewFSStore(db)
+	store, err := store.NewTestFSStore(db)
 
 	assertNoError(t, err)
 
