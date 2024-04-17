@@ -2,16 +2,20 @@ package cli
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
 
-func (c *CLI) PlayPoker() {
-	fmt.Fprint(c.output, "Please enter the number of players: ")
-	input := c.readLine()
+const PlayerPrompt = "Please enter the number of players: "
 
+func (c *CLI) PlayPoker() {
+	fmt.Fprint(c.output, PlayerPrompt)
+	numberOfPlayers, _ := strconv.Atoi(c.readLine())
+	c.scheduleBlindAlerts(numberOfPlayers)
+
+	input := c.readLine()
 	c.store.RecordWin(extractWinner(input))
-	c.scheduleBlindAlerts()
 }
 
 func (c *CLI) readLine() string {
@@ -20,13 +24,14 @@ func (c *CLI) readLine() string {
 	return c.input.Text()
 }
 
-func (c *CLI) scheduleBlindAlerts() {
+func (c *CLI) scheduleBlindAlerts(numberOfPlayers int) {
+	blindIncrement := time.Duration(5+numberOfPlayers) * time.Minute
 	blinds := []int{100, 200, 300, 400, 500, 600, 800, 1000, 2000, 4000, 8000}
 	blindTime := 0 * time.Second
 
 	for _, blind := range blinds {
 		c.alerter.ScheduledAlertAt(blindTime, blind)
-		blindTime = blindTime + 10*time.Minute
+		blindTime = blindTime + blindIncrement
 	}
 }
 

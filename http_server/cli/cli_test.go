@@ -40,8 +40,10 @@ func (s *SpyBlindAlerter) ScheduledAlertAt(dur time.Duration, amt int) {
 }
 
 var (
-	dummySpyAlerter = &SpyBlindAlerter{}
-	dummyStdOut     = &bytes.Buffer{}
+	dummySpyAlerter  = &SpyBlindAlerter{}
+	dummyPlayerStore = &StubPlayerStore{}
+	dummyStdOut      = &bytes.Buffer{}
+	playerPrompt     = "Please enter the number of players: "
 )
 
 func TestCLI(t *testing.T) {
@@ -84,7 +86,6 @@ func TestCLI(t *testing.T) {
 			{90 * time.Minute, 4000},
 			{100 * time.Minute, 8000},
 		}
-
 		for i, want := range cases {
 			t.Run(fmt.Sprint(want), func(t *testing.T) {
 				if len(alerter.alerts) <= i {
@@ -96,20 +97,49 @@ func TestCLI(t *testing.T) {
 			})
 		}
 	})
-	t.Run("prompts to enter number of players", func(t *testing.T) {
-		var (
-			dummyPlayerStore = &StubPlayerStore{}
-			dummyStdIn       = &bytes.Buffer{}
-		)
+	t.Run("prompts to enter number of players (old)", func(t *testing.T) {
+		var dummyStdIn = &bytes.Buffer{}
 
 		cli := cli.NewCLI(dummyPlayerStore, dummyStdIn, dummyStdOut, dummySpyAlerter)
 		cli.PlayPoker()
 
 		got := dummyStdOut.String()
-		want := "Please enter the number of players: "
+		want := playerPrompt
 
 		if got != want {
 			t.Errorf("got %q want %q", got, want)
+		}
+	})
+	t.Run("prompts to enter number of players", func(t *testing.T) {
+		stdout := &bytes.Buffer{}
+		in := strings.NewReader("7\n")
+		alerter := &SpyBlindAlerter{}
+
+		cli := cli.NewCLI(dummyPlayerStore, in, stdout, alerter)
+		cli.PlayPoker()
+
+		got := stdout.String()
+		want := playerPrompt
+
+		if got != want {
+			t.Errorf("got %q want %q", got, want)
+		}
+
+		cases := []scheduledAlert{
+			{0 * time.Second, 100},
+			{12 * time.Minute, 200},
+			{24 * time.Minute, 300},
+			{36 * time.Minute, 400},
+		}
+		for i, want := range cases {
+			t.Run(fmt.Sprint(want), func(t *testing.T) {
+				if len(alerter.alerts) <= i {
+					t.Fatalf("alert %d was not scheduled %v", i, alerter.alerts)
+				}
+
+				got := alerter.alerts[i]
+				assertScheduledAlert(t, got, want)
+			})
 		}
 	})
 }
