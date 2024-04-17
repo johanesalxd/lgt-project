@@ -1,0 +1,1 @@
+https://quii.gitbook.io/learn-go-with-tests/questions-and-answers/http-handlers-revisited
