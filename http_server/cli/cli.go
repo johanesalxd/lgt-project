@@ -23,13 +23,15 @@ func (b BlindAlerterFunc) ScheduledAlertAt(dur time.Duration, amt int) {
 type CLI struct {
 	store   server.PlayerStore
 	input   *bufio.Scanner
+	output  io.Writer
 	alerter BlindAlerter
 }
 
-func NewCLI(store server.PlayerStore, input io.Reader, alerter BlindAlerter) *CLI {
+func NewCLI(store server.PlayerStore, input io.Reader, output io.Writer, alerter BlindAlerter) *CLI {
 	return &CLI{
 		store:   store,
 		input:   bufio.NewScanner(input),
+		output:  output,
 		alerter: alerter,
 	}
 }

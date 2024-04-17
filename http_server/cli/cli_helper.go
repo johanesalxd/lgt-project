@@ -1,11 +1,13 @@
 package cli
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
 
 func (c *CLI) PlayPoker() {
+	fmt.Fprint(c.output, "Please enter the number of players: ")
 	input := c.readLine()
 
 	c.store.RecordWin(extractWinner(input))
