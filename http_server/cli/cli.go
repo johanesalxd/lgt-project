@@ -16,23 +16,29 @@ type BlindAlerter interface {
 
 type BlindAlerterFunc func(dur time.Duration, amt int)
 
-func (b BlindAlerterFunc) ScheduledAlertAt(dur time.Duration, amt int) {
-	b(dur, amt)
+type Game struct {
+	alerter BlindAlerter
+	store   server.PlayerStore
 }
 
 type CLI struct {
-	store   server.PlayerStore
-	input   *bufio.Scanner
-	output  io.Writer
-	alerter BlindAlerter
+	input  *bufio.Scanner
+	output io.Writer
+	game   *Game
 }
 
-func NewCLI(store server.PlayerStore, input io.Reader, output io.Writer, alerter BlindAlerter) *CLI {
+func NewCLI(input io.Reader, output io.Writer, game *Game) *CLI {
 	return &CLI{
-		store:   store,
-		input:   bufio.NewScanner(input),
-		output:  output,
+		input:  bufio.NewScanner(input),
+		output: output,
+		game:   game,
+	}
+}
+
+func NewGame(alerter BlindAlerter, store server.PlayerStore) *Game {
+	return &Game{
 		alerter: alerter,
+		store:   store,
 	}
 }
 

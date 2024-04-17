@@ -50,7 +50,9 @@ func TestCLI(t *testing.T) {
 	t.Run("record win from user input", func(t *testing.T) {
 		in := strings.NewReader("Chris wins\n")
 		store := &StubPlayerStore{}
-		cli := cli.NewCLI(store, in, dummyStdOut, dummySpyAlerter)
+
+		game := cli.NewGame(dummySpyAlerter, store)
+		cli := cli.NewCLI(in, dummyStdOut, game)
 
 		cli.PlayPoker()
 
@@ -59,18 +61,22 @@ func TestCLI(t *testing.T) {
 	t.Run("record win from other user input", func(t *testing.T) {
 		in := strings.NewReader("Cleo wins\n")
 		store := &StubPlayerStore{}
-		cli := cli.NewCLI(store, in, dummyStdOut, dummySpyAlerter)
+
+		game := cli.NewGame(dummySpyAlerter, store)
+		cli := cli.NewCLI(in, dummyStdOut, game)
 
 		cli.PlayPoker()
 
 		assertPlayerWin(t, store, "Cleo")
 	})
 	t.Run("scheduled printing of blind values", func(t *testing.T) {
-		in := strings.NewReader("Chris wins\n")
+		// in := strings.NewReader("Chris wins\n")
+		in := strings.NewReader("5\n")
 		store := &StubPlayerStore{}
 		alerter := &SpyBlindAlerter{}
 
-		cli := cli.NewCLI(store, in, dummyStdOut, alerter)
+		game := cli.NewGame(alerter, store)
+		cli := cli.NewCLI(in, dummyStdOut, game)
 		cli.PlayPoker()
 
 		cases := []scheduledAlert{
@@ -100,7 +106,8 @@ func TestCLI(t *testing.T) {
 	t.Run("prompts to enter number of players (old)", func(t *testing.T) {
 		var dummyStdIn = &bytes.Buffer{}
 
-		cli := cli.NewCLI(dummyPlayerStore, dummyStdIn, dummyStdOut, dummySpyAlerter)
+		game := cli.NewGame(dummySpyAlerter, dummyPlayerStore)
+		cli := cli.NewCLI(dummyStdIn, dummyStdOut, game)
 		cli.PlayPoker()
 
 		got := dummyStdOut.String()
@@ -115,7 +122,8 @@ func TestCLI(t *testing.T) {
 		in := strings.NewReader("7\n")
 		alerter := &SpyBlindAlerter{}
 
-		cli := cli.NewCLI(dummyPlayerStore, in, stdout, alerter)
+		game := cli.NewGame(alerter, dummyPlayerStore)
+		cli := cli.NewCLI(in, stdout, game)
 		cli.PlayPoker()
 
 		got := stdout.String()
