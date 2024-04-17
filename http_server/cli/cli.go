@@ -16,7 +16,12 @@ type BlindAlerter interface {
 
 type BlindAlerterFunc func(dur time.Duration, amt int)
 
-type Game struct {
+type Game interface {
+	Start(numberOfPlayers int)
+	Finish(winner string)
+}
+
+type TexasHoldem struct {
 	alerter BlindAlerter
 	store   server.PlayerStore
 }
@@ -24,10 +29,10 @@ type Game struct {
 type CLI struct {
 	input  *bufio.Scanner
 	output io.Writer
-	game   *Game
+	game   Game
 }
 
-func NewCLI(input io.Reader, output io.Writer, game *Game) *CLI {
+func NewCLI(input io.Reader, output io.Writer, game Game) *CLI {
 	return &CLI{
 		input:  bufio.NewScanner(input),
 		output: output,
@@ -35,8 +40,8 @@ func NewCLI(input io.Reader, output io.Writer, game *Game) *CLI {
 	}
 }
 
-func NewGame(alerter BlindAlerter, store server.PlayerStore) *Game {
-	return &Game{
+func NewTexasHoldem(alerter BlindAlerter, store server.PlayerStore) *TexasHoldem {
+	return &TexasHoldem{
 		alerter: alerter,
 		store:   store,
 	}
